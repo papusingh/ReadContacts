@@ -60,21 +60,22 @@ public class MainActivity extends AppCompatActivity {
         ContentResolver contentResolver = getContentResolver();
         Cursor cursor = contentResolver.query(CONTENT_URI,null,null,null,DISPLAY_NAME);
 
-        if (cursor.getCount() > 0){
-            while (cursor.moveToNext()){
+        if (cursor != null && cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
                 String CONTACT_ID = cursor.getString(cursor.getColumnIndex(ID));
                 String name = cursor.getString(cursor.getColumnIndex(DISPLAY_NAME));
 
                 int hasPhoneNumber = cursor.getInt(cursor.getColumnIndex(HAS_PHONE_NUMBER));
                 ContactModel contactModel = new ContactModel();
-                if (hasPhoneNumber > 0){
+                if (hasPhoneNumber > 0) {
                     contactModel.setName(name);
 
-                    Cursor phoneCursor = contentResolver.query(PHONE_URI, new String[]{NUMBER},PHONE_ID+" = ?",new String[]{CONTACT_ID},null);
+                    Cursor phoneCursor = contentResolver.query(PHONE_URI, new String[]{NUMBER}, PHONE_ID + " = ?", new String[]{CONTACT_ID}, null);
                     List<String> contactList = new ArrayList<>();
+                    assert phoneCursor != null;
                     phoneCursor.moveToFirst();
-                    while (!phoneCursor.isAfterLast()){
-                        String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(NUMBER)).replace(" ","");
+                    while (!phoneCursor.isAfterLast()) {
+                        String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(NUMBER)).replace(" ", "");
                         contactList.add(phoneNumber);
                         phoneCursor.moveToNext();
                     }
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             contactAdapter.notifyDataSetChanged();
+            cursor.close();
         }
     }
 
